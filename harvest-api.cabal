@@ -24,11 +24,17 @@ flag dev
   default:            False
 
 library
-  build-depends:      base             >= 4.8 && < 5
+  build-depends:      aeson            >= 0.9
+                    , base             >= 4.8 && < 5
+                    , bytestring       >= 0.10.4.1
                     , http-client      >= 0.4.26
                     , http-client-tls  >= 0.2.4
+                    , mtl              >= 2.2.0.1
                     , servant          >= 0.7
                     , servant-client   >= 0.7
+                    , text             >= 1.2
+                    , time             >= 1.5.0.1
+                    , transformers     >= 0.4 && < 0.6
   exposed-modules:    Web.Harvest.API
                     , Web.Harvest.API.Type
   if flag(dev)
@@ -43,7 +49,8 @@ test-suite tests
   type:               exitcode-stdio-1.0
   build-depends:      base             >= 4.8 && < 5
                     , harvest-api      >= 0.1.0
-  -- other-modules:      Module
+                    , hspec            >= 2.0
+  other-modules:      Web.Harvest.APISpec
   if flag(dev)
     ghc-options:      -Wall -Werror
   else
