@@ -47,9 +47,13 @@ test-suite tests
   main-is:            Spec.hs
   hs-source-dirs:     tests
   type:               exitcode-stdio-1.0
-  build-depends:      base             >= 4.8 && < 5
+  build-depends:      aeson            >= 0.11
+                    , base             >= 4.8 && < 5
+                    , bytestring       >= 0.10.4.1
+                    , file-embed
                     , harvest-api      >= 0.1.0
                     , hspec            >= 2.0
+                    , time             >= 1.5.0.1
   other-modules:      Web.Harvest.APISpec
   if flag(dev)
     ghc-options:      -Wall -Werror

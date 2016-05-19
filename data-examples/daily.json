@@ -1,0 +1,37 @@
+{
+    "for_day": "2016-01-27",
+    "day_entries": [
+        {
+            "id": 420923769,
+            "user_id": 508343,
+            "spent_at": "2016-01-27",
+            "created_at":"2016-01-27T04:07:24Z",
+            "updated_at":"2016-01-27T05:28:17Z",
+            "project_id": "5198193",
+            "task_id": "2892243",
+            "project": "Internal",
+            "task": "Internal Development",
+            "client": "Apple",
+            "notes": "Here goes the description entered by the user.",
+            "hours_without_timer": 1.16,
+            "hours": 2.77,
+            "timer_started_at":"2016-01-27T05:28:17Z"
+        },
+        {
+            "id": 420923783,
+            "user_id": 508343,
+            "spent_at": "2016-01-27",
+            "created_at":"2016-01-27T04:07:24Z",
+            "updated_at":"2016-01-27T05:28:17Z",
+            "project_id": "5198193",
+            "task_id": "2892243",
+            "project": "Internal",
+            "task": "Internal Development",
+            "client": "Apple",
+            "notes": null,
+            "hours_without_timer": 1,
+            "hours": 2,
+            "timer_started_at":"2016-01-27T05:28:17Z"
+        }
+    ]
+}
