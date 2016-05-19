@@ -23,12 +23,12 @@ data Credentials = Credentials
   { credentialsUsername :: ByteString -- ^ Username
   , credentialsPassword :: ByteString -- ^ Password
   , credentialsAccount  :: ByteString -- ^ Account (name of your organization)
-  } deriving (Eq, Show)
+  } deriving (Eq, Ord, Show)
 
 -- | User identifier.
 
 newtype UserId = UserId { unUserId :: Word }
-  deriving (Eq, Show, FromJSON, ToHttpApiData)
+  deriving (Eq, Ord, Show, FromJSON, ToHttpApiData)
 
 -- | User record.
 
@@ -53,7 +53,7 @@ data User = User
   , userCostRate     :: Maybe Word -- ^ User's cost rate
   , userIdentityAccountId :: Maybe Word -- ^ Identity account id
   , userIdentityUserId :: Maybe Word -- ^ Identity user id
-  } deriving (Eq, Show)
+  } deriving (Eq, Ord, Show)
 
 instance FromJSON User where
   parseJSON = withObject "User" $ \o -> do
@@ -86,7 +86,7 @@ instance FromJSON User where
 data TimeEntries = TimeEntries
   { teForDay     :: Day -- ^ That collection is for this day
   , teDayEntries :: [TimeEntry] -- ^ Collection of time entries
-  } deriving (Eq, Show)
+  } deriving (Eq, Ord, Show)
 
 instance FromJSON TimeEntries where
   parseJSON = withObject "TimeEntries" $ \o -> do
@@ -98,7 +98,7 @@ instance FromJSON TimeEntries where
 
 newtype TimeEntryId = TimeEntryId
   { unTimeEntryId :: Word }
-  deriving (Eq, Show, FromJSON)
+  deriving (Eq, Ord, Show, FromJSON)
 
 -- | A time entry.
 
@@ -117,7 +117,7 @@ data TimeEntry = TimeEntry
   , teUpdatedAt :: UTCTime -- ^ When the task was updated
   , teHoursWithoutTimer :: Double -- ^ Hours without timer
   , teHours     :: Double -- ^ Hours
-  } deriving (Eq, Show)
+  } deriving (Eq, Ord, Show)
 
 instance FromJSON TimeEntry where
   parseJSON = withObject "TimeEntry" $ \o -> do
