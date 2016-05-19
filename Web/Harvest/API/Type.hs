@@ -112,7 +112,8 @@ data TimeEntry = TimeEntry
   , teClient    :: Text -- ^ Client name
   , teId        :: TimeEntryId -- ^ Time entry id
   , teNotes     :: Maybe Text -- ^ Notes
-  , teTimerStartedAt :: UTCTime -- ^ When the task was started
+  , teTimerStartedAt :: Maybe UTCTime
+    -- ^ When the task was started, if 'Nothing' — timer is not running
   , teCreatedAt :: UTCTime -- ^ When the task was created
   , teUpdatedAt :: UTCTime -- ^ When the task was updated
   , teHoursWithoutTimer :: Double -- ^ Hours without timer
@@ -130,7 +131,7 @@ instance FromJSON TimeEntry where
     teClient         <- o .: "client"
     teId             <- o .: "id"
     teNotes          <- o .: "notes"
-    teTimerStartedAt <- o .: "timer_started_at"
+    teTimerStartedAt <- o .:? "timer_started_at"
     teCreatedAt      <- o .: "created_at"
     teUpdatedAt      <- o .: "updated_at"
     teHoursWithoutTimer <- o .: "hours_without_timer"
