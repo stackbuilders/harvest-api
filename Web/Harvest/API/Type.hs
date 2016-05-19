@@ -137,9 +137,3 @@ instance FromJSON TimeEntry where
     teHoursWithoutTimer <- o .: "hours_without_timer"
     teHours          <- o .: "hours"
     return TimeEntry {..}
-
--- | Parse time of day in the \"HH:MMam\" (\"HH:MMpm\") format.
-
--- parseDiffTime :: Value -> A.Parser TimeOfDay
--- parseDiffTime = withText "time of day"
---   (Time.parseTimeM False Time.defaultTimeLocale "%l:%M%P" . T.unpack)
