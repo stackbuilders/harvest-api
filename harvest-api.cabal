@@ -1,8 +1,8 @@
 name:                 harvest-api
 version:              0.1.0
 cabal-version:        >= 1.10
-license:              AllRightsReserved
-license-file:         LICENSE.md
+license:              MIT
+license-file:         LICENSE
 author:               Stack Builders
 maintainer:           Stack Builders
 homepage:             https://github.com/stackbuilders/harvest-api
