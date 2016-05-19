@@ -14,11 +14,8 @@ where
 import Data.Aeson
 import Data.ByteString (ByteString)
 import Data.Text (Text)
-import Data.Time (UTCTime, Day, TimeOfDay)
+import Data.Time (UTCTime, Day)
 import Servant.API
-import qualified Data.Aeson.Types as A
-import qualified Data.Text        as T
-import qualified Data.Time        as Time
 
 -- | Information that is necessary for interaction with Harvest API.
 
@@ -44,7 +41,7 @@ data User = User
   , userLastName     :: Text -- ^ The user's last name
   , userTimeZone     :: Text -- ^ The user's time zone ('Text' for now)
   , userIsContractor :: Bool -- ^ Is the user contractor?
-  , userTelephone    :: Maybe Text -- ^ User's telephone (if available)
+  , userTelephone    :: Text -- ^ User's telephone
   , userIsActive     :: Bool -- ^ Is it an active user?
   , userAccessFuture :: Bool
     -- ^ Does he\/she have access to all future projects?
@@ -54,44 +51,50 @@ data User = User
     -- ^ Does he\/she want to recieve newsletter?
   , userUpdatedAt    :: UTCTime -- ^ Time of last update of account
   , userCostRate     :: Maybe Word -- ^ User's cost rate
-  , userIdentityAccountId :: Word -- ^ Identity account id
-  , userIdentityUserId :: Word -- ^ Identity user id
+  , userIdentityAccountId :: Maybe Word -- ^ Identity account id
+  , userIdentityUserId :: Maybe Word -- ^ Identity user id
   } deriving (Eq, Show)
 
 instance FromJSON User where
   parseJSON = withObject "User" $ \o -> do
-    userId           <- o .: "id"
-    userEmail        <- o .: "email"
-    userCreatedAt    <- o .: "created_at"
-    userIsAdmin      <- o .: "is_admin"
-    userFirstName    <- o .: "first_name"
-    userLastName     <- o .: "last_name"
-    userTimeZone     <- o .: "timezone"
-    userIsContractor <- o .: "is_contractor"
-    userTelephone    <- o .: "telephone"
-    userIsActive     <- o .: "is_active"
-    userAccessFuture <- o .: "has_access_to_all_future_projects"
-    userDefaultHourlyRate <- o .: "default_hourly_rate"
-    userDepartment   <- o .: "department"
-    userWantsNewsletter <- o .: "wants_newsletter"
-    userUpdatedAt    <- o .: "updated_at"
-    userCostRate     <- o .: "cost_rate"
-    userIdentityAccountId <- o .: "identity_user_id"
-    userIdentityUserId <- o .: "identity_user_id"
+    u                <- o .: "user"
+    userId           <- u .: "id"
+    userEmail        <- u .: "email"
+    userCreatedAt    <- u .: "created_at"
+    userIsAdmin      <- u .: "is_admin"
+    userFirstName    <- u .: "first_name"
+    userLastName     <- u .: "last_name"
+    userTimeZone     <- u .: "timezone"
+    userIsContractor <- u .: "is_contractor"
+    userTelephone    <- u .: "telephone"
+    userIsActive     <- u .: "is_active"
+    userAccessFuture <- u .: "has_access_to_all_future_projects"
+    userDefaultHourlyRate <- u .: "default_hourly_rate"
+    userDepartment   <- u .: "department"
+    userWantsNewsletter <- u .: "wants_newsletter"
+    userUpdatedAt    <- u .: "updated_at"
+    userCostRate     <- u .: "cost_rate"
+    userIdentityAccountId <- u .:? "identity_account_id"
+    userIdentityUserId <- u .:? "identity_user_id"
     return User {..}
 
 -- | Collection of entries for specific day.
 
+-- TODO This response also contains the "projects" field with some stuff,
+-- we could parse it as well, but let's skip it for now.
+
 data TimeEntries = TimeEntries
-  { teDayEntries :: [TimeEntry] -- ^ Collection of time entries
-  , teForDay     :: Day -- ^ That collection is for this day
+  { teForDay     :: Day -- ^ That collection is for this day
+  , teDayEntries :: [TimeEntry] -- ^ Collection of time entries
   } deriving (Eq, Show)
 
 instance FromJSON TimeEntries where
   parseJSON = withObject "TimeEntries" $ \o -> do
     teDayEntries <- o .: "day_entries"
-    teForDay     <- (o .: "for_day") >>= parseDay
+    teForDay     <- o .: "for_day"
     return TimeEntries {..}
+
+-- | Time entry identifier.
 
 newtype TimeEntryId = TimeEntryId
   { unTimeEntryId :: Word }
@@ -105,16 +108,15 @@ data TimeEntry = TimeEntry
   , teUserId    :: UserId -- ^ User id
   , teSpentAt   :: Day  -- ^ The day this time is spent on
   , teTaskId    :: Text -- ^ Task id
-  , teTask      :: Text -- ^ Backend programming
+  , teTask      :: Text -- ^ Task name
   , teClient    :: Text -- ^ Client name
   , teId        :: TimeEntryId -- ^ Time entry id
   , teNotes     :: Maybe Text -- ^ Notes
-  , teStartedAt :: TimeOfDay -- ^ When the task was started
-  , teEndedAt   :: TimeOfDay -- ^ When the task was finished
+  , teTimerStartedAt :: UTCTime -- ^ When the task was started
   , teCreatedAt :: UTCTime -- ^ When the task was created
   , teUpdatedAt :: UTCTime -- ^ When the task was updated
-  , teHoursWithoutTimer :: Word -- ^ Hours without timer
-  , teHours     :: Word -- ^ Hours
+  , teHoursWithoutTimer :: Double -- ^ Hours without timer
+  , teHours     :: Double -- ^ Hours
   } deriving (Eq, Show)
 
 instance FromJSON TimeEntry where
@@ -122,28 +124,21 @@ instance FromJSON TimeEntry where
     teProjectId      <- o .: "project_id"
     teProject        <- o .: "project"
     teUserId         <- o .: "user_id"
-    teSpentAt        <- (o .: "spent_at") >>= parseDay
+    teSpentAt        <- o .: "spent_at"
     teTaskId         <- o .: "task_id"
     teTask           <- o .: "task"
     teClient         <- o .: "client"
     teId             <- o .: "id"
     teNotes          <- o .: "notes"
-    teStartedAt      <- (o .: "started_at") >>= parseDiffTime
-    teEndedAt        <- (o .: "ended_at") >>= parseDiffTime
+    teTimerStartedAt <- o .: "timer_started_at"
     teCreatedAt      <- o .: "created_at"
     teUpdatedAt      <- o .: "updated_at"
     teHoursWithoutTimer <- o .: "hours_without_timer"
     teHours          <- o .: "hours"
     return TimeEntry {..}
 
--- | Parse day in ISO 8601 format (\"YYYY-MM-DD\").
-
-parseDay :: Value -> A.Parser Day
-parseDay = withText "time in ISO 8601 format"
-  (Time.parseTimeM False Time.defaultTimeLocale "%F" . T.unpack)
-
 -- | Parse time of day in the \"HH:MMam\" (\"HH:MMpm\") format.
 
-parseDiffTime :: Value -> A.Parser TimeOfDay
-parseDiffTime = withText "time of day"
-  (Time.parseTimeM False Time.defaultTimeLocale "%l:%M%P" . T.unpack)
+-- parseDiffTime :: Value -> A.Parser TimeOfDay
+-- parseDiffTime = withText "time of day"
+--   (Time.parseTimeM False Time.defaultTimeLocale "%l:%M%P" . T.unpack)
