@@ -17,8 +17,7 @@ import Data.Monoid (Sum (..))
 import Data.Proxy
 import Data.Time (Day)
 import Data.Void
-import Network.HTTP.Client (Manager, newManager)
-import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Network.HTTP.Client (Manager)
 import Servant.API
 import Servant.Client
 import Web.Harvest.API.Type
@@ -50,29 +49,31 @@ getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
 -- | Get list of all users for specific account.
 
 getUsers :: MonadIO m
-  => Credentials       -- ^ Credentials
+  => Manager           -- ^ HTTPS manager
+  -> Credentials       -- ^ Credentials
   -> m (Either ServantError [User]) -- ^ Result of request
 getUsers = runHarvestQuery getUsers_
 
 -- | Get time entries for specific date and user.
 
 getTimeEntries :: MonadIO m
-  => Credentials       -- ^ Credentials
+  => Manager           -- ^ HTTPS manager
+  -> Credentials       -- ^ Credentials
   -> Day               -- ^ Date of interest
   -> UserId            -- ^ User id
   -> m (Either ServantError TimeEntries)
-getTimeEntries creds date uid =
-  runHarvestQuery (getTimeEntries_ day year (Just uid)) creds
+getTimeEntries manager creds date uid =
+  runHarvestQuery (getTimeEntries_ day year (Just uid)) manager creds
   where (day, year) = getDayAndYear date
 
 -- | A helper to run a query against Harvest API.
 
 runHarvestQuery :: MonadIO m
-  => (BasicAuthData -> Manager -> BaseUrl -> ClientM a)
-  -> Credentials
-  -> m (Either ServantError a)
-runHarvestQuery action Credentials {..} = liftIO $ do
-  manager <- newManager tlsManagerSettings
+  => (BasicAuthData -> Manager -> BaseUrl -> ClientM a) -- ^ Query function
+  -> Manager           -- ^ HTTPS Manager
+  -> Credentials       -- ^ Credentials
+  -> m (Either ServantError a) -- ^ The result
+runHarvestQuery action manager Credentials {..} = liftIO $ do
   let host     = BC8.unpack credentialsAccount ++ ".harvestapp.com"
       authData = BasicAuthData credentialsUsername credentialsPassword
   runExceptT (action authData manager (BaseUrl Https host 443 ""))
