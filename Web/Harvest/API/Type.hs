@@ -1,3 +1,15 @@
+-- |
+-- Module      :  Web.Harvest.API.Type
+-- Copyright   :  © 2016 Stack Builders
+-- License     :  MIT
+--
+-- Maintainer  :  Mark Karpov <mkarpov@stackbuilders.com>
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- Used types, they are re-exported in "Web.Harvest.API", so you can import
+-- just that module.
+
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RecordWildCards            #-}

@@ -4,7 +4,7 @@ cabal-version:        >= 1.10
 license:              MIT
 license-file:         LICENSE.md
 author:               Stack Builders
-maintainer:           Stack Builders
+maintainer:           Mark Karpov <mkarpov@stackbuilders.com>
 homepage:             https://github.com/stackbuilders/harvest-api
 bug-reports:          https://github.com/stackbuilders/harvest-api/issues
 category:             Web

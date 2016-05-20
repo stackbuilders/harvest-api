@@ -1,3 +1,14 @@
+-- |
+-- Module      :  Web.Harvest.API
+-- Copyright   :  © 2016 Stack Builders
+-- License     :  MIT
+--
+-- Maintainer  :  Mark Karpov <mkarpov@stackbuilders.com>
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- High-level bindings to the Harvest web API.
+
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
