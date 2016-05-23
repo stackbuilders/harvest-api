@@ -9,6 +9,7 @@
 --
 -- High-level bindings to the Harvest web API.
 
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -34,6 +35,11 @@ import Servant.Client
 import Web.Harvest.API.Type
 import qualified Data.ByteString.Char8 as BC8
 import qualified Data.Time             as Time
+
+#if !MIN_VERSION_base(4,8,0)
+import Data.Foldable (foldMap)
+import Data.Word (Word)
+#endif
 
 -- | Type representation of Basic Auth. We don't serve the API, so user type
 -- is just 'Void'.

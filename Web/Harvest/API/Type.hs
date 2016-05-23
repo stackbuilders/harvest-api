@@ -10,6 +10,7 @@
 -- Used types, they are re-exported in "Web.Harvest.API", so you can import
 -- just that module.
 
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RecordWildCards            #-}
@@ -28,6 +29,10 @@ import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Data.Time (UTCTime, Day)
 import Servant.API
+
+#if !MIN_VERSION_base(4,8,0)
+import Data.Word (Word)
+#endif
 
 -- | Information that is necessary for interaction with Harvest API.
 
