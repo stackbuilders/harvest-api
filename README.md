@@ -1,6 +1,9 @@
 # Harvest API
 
-[![CircleCI](https://circleci.com/gh/stackbuilders/harvest-api.svg?style=svg&circle-token=1f9cf54be4f5b977dddf02e5398d8ce2c66ffd87)](https://circleci.com/gh/stackbuilders/harvest-api)
+[![License MIT](https://img.shields.io/badge/license-mit-brightgreen.svg)](http://opensource.org/licenses/MIT)
+[![Hackage](https://img.shields.io/hackage/v/harvest-api.svg?style=flat)](https://hackage.haskell.org/package/harvest-api)
+[![Stackage Nightly](http://stackage.org/package/harvest-api/badge/nightly)](http://stackage.org/nightly/package/harvest-api)
+[![Build Status](https://travis-ci.org/stackbuilders/harvest-api.svg?branch=master)](https://travis-ci.org/stackbuilders/harvest-api)
 
 Haskell bindings to [Harvest API](http://help.getharvest.com/api/).
 
