@@ -24,7 +24,6 @@ module Web.Harvest.API
   , getTimeEntries )
 where
 
-import Control.Monad.Except
 import Data.Monoid (Sum (..))
 import Data.Proxy
 import Data.Time (Day)
@@ -65,14 +64,13 @@ getTimeEntries_ :: Word -> Word -> Maybe UserId -> Query TimeEntries
 
 getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
 
-
 -- | Get list of all users for specific account.
 
-getUsers :: Manager     -- ^ Http Manager
-         -> Credentials -- ^ Credentials
+getUsers :: Manager                         -- ^ Http Manager
+         -> Credentials                     -- ^ Credentials
          -> IO (Either ServantError [User]) -- ^ Result of request
 getUsers manager creds =
-  let env = ClientEnv manager undefined -- baseUrl
+  let env = ClientEnv manager (getBaseUrl creds)
   in runClientM (runHarvestQuery getUsers_ creds) env
 
 -- | Get time entries for specific date and user.
@@ -83,21 +81,17 @@ getTimeEntries :: Manager           -- ^ Http Manager
                -> UserId            -- ^ User id
                -> IO (Either ServantError TimeEntries)
 getTimeEntries manager creds date uid =
-  let env = ClientEnv manager undefined -- baseUrl
+  let env = ClientEnv manager (getBaseUrl creds)
       (day, year) = getDayAndYear date
   in runClientM (runHarvestQuery (getTimeEntries_ day year $ Just uid) creds) env
 
 -- | A helper to run a query against Harvest API.
 
 runHarvestQuery :: (BasicAuthData -> ClientM a) -- ^ Query function
-                -> Credentials       -- ^ Credentials
-                -> ClientM a -- ^ The result
+                -> Credentials                  -- ^ Credentials
+                -> ClientM a                    -- ^ The result
 runHarvestQuery action Credentials {..} =
   action (BasicAuthData credentialsUsername credentialsPassword)
-
-
--- let
---      authData =
 
 -- | Extract day and year from given date. Days are in the range from 1 to
 -- 366.
@@ -108,3 +102,11 @@ getDayAndYear date = (day, fromIntegral year)
     (year, month, day') = Time.toGregorian date
     day = fromIntegral . (+ day') . getSum . foldMap
       (Sum . Time.gregorianMonthLength year) $ [1..pred month]
+
+
+-- | Get base url from Credentials
+getBaseUrl :: Credentials   -- ^ Credentials
+           -> BaseUrl       -- ^ Base Url
+getBaseUrl Credentials {..} =
+  let host = BC8.unpack credentialsAccount ++ ".harvestapp.com"
+  in BaseUrl Https host 443 ""
