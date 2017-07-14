@@ -50,50 +50,54 @@ type Auth = BasicAuth "" Void
 
 type HarvestAPI =
        "people" :> Auth :> Get '[JSON] [User]
-  :<|> "daily"  :> Capture "day" Word :> Capture "year" Word
+  :<|> "daily"  :> Capture "day" Word
+                :> Capture "year" Word
                 :> QueryParam "of_user" UserId
-                :> Auth :> Get '[JSON] TimeEntries
+                :> Auth
+                :> Get '[JSON] TimeEntries
 
 -- | A shortcut for the boilerplate arguments.
 
-type Query a = BasicAuthData -> Manager -> BaseUrl -> ClientM a
+type Query a = BasicAuthData -> ClientM a
 
 getUsers_       :: Query [User]
 getTimeEntries_ :: Word -> Word -> Maybe UserId -> Query TimeEntries
 
 getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
 
+
 -- | Get list of all users for specific account.
 
-getUsers :: MonadIO m
-  => Manager           -- ^ HTTPS manager
-  -> Credentials       -- ^ Credentials
-  -> m (Either ServantError [User]) -- ^ Result of request
-getUsers = runHarvestQuery getUsers_
+getUsers :: Manager     -- ^ Http Manager
+         -> Credentials -- ^ Credentials
+         -> IO (Either ServantError [User]) -- ^ Result of request
+getUsers manager creds =
+  let env = ClientEnv manager undefined -- baseUrl
+  in runClientM (runHarvestQuery getUsers_ creds) env
 
 -- | Get time entries for specific date and user.
 
-getTimeEntries :: MonadIO m
-  => Manager           -- ^ HTTPS manager
-  -> Credentials       -- ^ Credentials
-  -> Day               -- ^ Date of interest
-  -> UserId            -- ^ User id
-  -> m (Either ServantError TimeEntries)
+getTimeEntries :: Manager           -- ^ Http Manager
+               -> Credentials       -- ^ Credentials
+               -> Day               -- ^ Date of interest
+               -> UserId            -- ^ User id
+               -> IO (Either ServantError TimeEntries)
 getTimeEntries manager creds date uid =
-  runHarvestQuery (getTimeEntries_ day year (Just uid)) manager creds
-  where (day, year) = getDayAndYear date
+  let env = ClientEnv manager undefined -- baseUrl
+      (day, year) = getDayAndYear date
+  in runClientM (runHarvestQuery (getTimeEntries_ day year $ Just uid) creds) env
 
 -- | A helper to run a query against Harvest API.
 
-runHarvestQuery :: MonadIO m
-  => (BasicAuthData -> Manager -> BaseUrl -> ClientM a) -- ^ Query function
-  -> Manager           -- ^ HTTPS Manager
-  -> Credentials       -- ^ Credentials
-  -> m (Either ServantError a) -- ^ The result
-runHarvestQuery action manager Credentials {..} = liftIO $ do
-  let host     = BC8.unpack credentialsAccount ++ ".harvestapp.com"
-      authData = BasicAuthData credentialsUsername credentialsPassword
-  runExceptT (action authData manager (BaseUrl Https host 443 ""))
+runHarvestQuery :: (BasicAuthData -> ClientM a) -- ^ Query function
+                -> Credentials       -- ^ Credentials
+                -> ClientM a -- ^ The result
+runHarvestQuery action Credentials {..} =
+  action (BasicAuthData credentialsUsername credentialsPassword)
+
+
+-- let
+--      authData =
 
 -- | Extract day and year from given date. Days are in the range from 1 to
 -- 366.
