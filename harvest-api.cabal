@@ -29,8 +29,8 @@ library
                     , bytestring       >= 0.10.4.1
                     , http-client      >= 0.4.26
                     , mtl              >= 2.2.0.1
-                    , servant          == 0.9.1.1
-                    , servant-client   == 0.9.1.1
+                    , servant          == 0.9.1.*
+                    , servant-client   == 0.9.1.*
                     , text             >= 1.2
                     , time             >= 1.5.0.1
                     , transformers     >= 0.4 && < 0.6

@@ -66,7 +66,7 @@ getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
 
 -- | Get list of all users for specific account.
 
-getUsers :: Manager                         -- ^ Http Manager
+getUsers :: Manager                         -- ^ HTTP Manager
          -> Credentials                     -- ^ Credentials
          -> IO (Either ServantError [User]) -- ^ Result of request
 getUsers manager creds =
@@ -75,7 +75,7 @@ getUsers manager creds =
 
 -- | Get time entries for specific date and user.
 
-getTimeEntries :: Manager           -- ^ Http Manager
+getTimeEntries :: Manager           -- ^ HTTP Manager
                -> Credentials       -- ^ Credentials
                -> Day               -- ^ Date of interest
                -> UserId            -- ^ User id
@@ -87,9 +87,9 @@ getTimeEntries manager creds date uid =
 
 -- | A helper to run a query against Harvest API.
 
-runHarvestQuery :: (BasicAuthData -> ClientM a) -- ^ Query function
-                -> Credentials                  -- ^ Credentials
-                -> ClientM a                    -- ^ The result
+runHarvestQuery :: Query a        -- ^ Query function
+                -> Credentials    -- ^ Credentials
+                -> ClientM a      -- ^ The result
 runHarvestQuery action Credentials {..} =
   action (BasicAuthData credentialsUsername credentialsPassword)
 
