@@ -67,7 +67,7 @@ data User = User
   , userWantsNewsletter :: Bool
     -- ^ Does he\/she want to recieve newsletter?
   , userUpdatedAt    :: UTCTime -- ^ Time of last update of account
-  , userCostRate     :: Maybe Word -- ^ User's cost rate
+  , userCostRate     :: Maybe Float -- ^ User's cost rate
   , userIdentityAccountId :: Maybe Word -- ^ Identity account id
   , userIdentityUserId :: Maybe Word -- ^ Identity user id
   } deriving (Eq, Ord, Show)
