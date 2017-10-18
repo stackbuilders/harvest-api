@@ -1,5 +1,5 @@
 name:                 harvest-api
-version:              0.1.0
+version:              0.1.1
 cabal-version:        >= 1.10
 license:              MIT
 license-file:         LICENSE.md
