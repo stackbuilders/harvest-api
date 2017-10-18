@@ -62,12 +62,12 @@ data User = User
   , userIsActive     :: Bool -- ^ Is it an active user?
   , userAccessFuture :: Bool
     -- ^ Does he\/she have access to all future projects?
-  , userDefaultHourlyRate :: Word -- ^ Default hourly rate
+  , userDefaultHourlyRate :: Maybe Word -- ^ Default hourly rate
   , userDepartment   :: Maybe Text -- ^ User's department
   , userWantsNewsletter :: Bool
     -- ^ Does he\/she want to recieve newsletter?
   , userUpdatedAt    :: UTCTime -- ^ Time of last update of account
-  , userCostRate     :: Maybe Word -- ^ User's cost rate
+  , userCostRate     :: Maybe Float -- ^ User's cost rate
   , userIdentityAccountId :: Maybe Word -- ^ Identity account id
   , userIdentityUserId :: Maybe Word -- ^ Identity user id
   } deriving (Eq, Ord, Show)
